@@ -227,8 +227,14 @@ class NWays(TaskTransform):
         labels = self.dataset.labels
         task_description = []
         labels_to_indices = dict(self.dataset.labels_to_indices)
+        # Randomly sample n classes from all possible classes (labels)
+        if self.n > len(labels):
+            raise ValueError(
+                "Cannot sample {} classes from {} available classes.".format(
+                    self.n, len(labels)))
         classes = random.sample(labels, k=self.n)
         for cl in classes:
+            # Collect all images from these classes (labels)
             for idx in labels_to_indices[cl]:
                 task_description.append(DataDescription(idx))
         return task_description
@@ -279,6 +285,8 @@ class KShots(TaskTransform):
             task_description = self.new_task()
         # TODO: The order of the data samples is not preserved.
         class_to_data = collections.defaultdict(list)
+        
+        # Take note of all class labels present in the current sample
         for dd in task_description:
             cls = self.dataset.indices_to_labels[dd.index]
             class_to_data[cls].append(dd)
@@ -289,7 +297,12 @@ class KShots(TaskTransform):
         else:
             sampler = random.sample
 
-        return list(itertools.chain(*[sampler(dds, k=self.k) for dds in class_to_data.values()]))
+        try:
+            # Sample 'k' datapoints from each class (label)
+            return list(itertools.chain(*[sampler(dds, k=self.k) for dds in class_to_data.values()]))
+        except ValueError:
+            raise ValueError("Asked to sample {} datapoints from {} available datapoints.".format(
+                self.k, [len(x) for x in class_to_data.values()]))
 
 
 class FusedNWaysKShots(TaskTransform):
