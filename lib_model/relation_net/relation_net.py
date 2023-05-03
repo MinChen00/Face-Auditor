@@ -63,7 +63,9 @@ class RelationNet(FewShotBase):
 
 
     def train_model(self, train_dset, test_dset):
+        self.feat_encoder.train()
         self.model.train()
+
         train_loader = DataLoader(train_dset, pin_memory=True, shuffle=True)
 
         feat_encoder_optim = torch.optim.Adam(self.feat_encoder.parameters(), lr=0.001)
@@ -121,6 +123,7 @@ class RelationNet(FewShotBase):
             return train_acc, test_acc
 
     def evaluate_model(self, test_dset):
+        self.feat_encoder.train()
         self.model.eval()
 
         test_loader = DataLoader(test_dset, pin_memory=True, shuffle=True)
@@ -135,6 +138,7 @@ class RelationNet(FewShotBase):
         return (n_acc / loss_ctr).item()
 
     def probe_model(self, probe_dset):
+        self.feat_encoder.train()
         self.model.eval()
         probe_loader = DataLoader(probe_dset, pin_memory=True, shuffle=True)
         ret_logit = []
@@ -154,6 +158,8 @@ class RelationNet(FewShotBase):
         return np.stack(ret_logit), torch.stack(train_class).numpy(), torch.cat(batch_similarity).numpy()
 
     def probe_model_full(self, probe_dset):
+        self.feat_encoder.train()
+        self.feat_encoder.to(self.device)
         self.model.eval()
         self.model.to(self.device)
 
@@ -196,7 +202,7 @@ class RelationNet(FewShotBase):
         sample_features = sample_features.view(ways, shot, self.feat_dim,
                                                sample_features.shape[2],
                                                sample_features.shape[3])
-        sample_features = torch.sum(sample_features, 1).squeeze(1)
+        sample_features = torch.mean(sample_features, 1).squeeze(1)
         batch_features = self.feat_encoder(batches)  # 20x64*5*5
 
         # calculate relations
@@ -252,6 +258,8 @@ class RelationNet(FewShotBase):
         return batch_features
 
     def generate_embeddings(self, probe_dset):
+        self.feat_encoder.train()
+        self.feat_encoder.to(self.device)
         self.model.eval()
         self.model.to(self.device)
 
