@@ -196,7 +196,7 @@ class RelationNet(FewShotBase):
         sample_features = sample_features.view(ways, shot, self.feat_dim,
                                                sample_features.shape[2],
                                                sample_features.shape[3])
-        sample_features = torch.sum(sample_features, 1).squeeze(1)
+        sample_features = torch.mean(sample_features, 1).squeeze(1)
         batch_features = self.feat_encoder(batches)  # 20x64*5*5
 
         # calculate relations
