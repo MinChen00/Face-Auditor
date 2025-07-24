@@ -2,7 +2,7 @@
 
 This repo contains the implementation of Face-Auditor, which aims to evaluate the privacy leakage in the state-of-the-art few-shot learning pipeline.
 
-### Code Strcuture
+### Code Structure
 
 ```
 .
@@ -83,4 +83,16 @@ python main.py --is_noise_defense true
 ## memguard (adaptive) defense parameters ##
 python main.py --is_memguard_defense true
 
+```
+
+
+### Citation
+
+```
+@inproceedings{chen2023faceauditor,
+  author    = {Min Chen and Zhikun Zhang and Tianhao Wang and Michael Backes and Yang Zhang},
+  title     = {{FACE-AUDITOR:} Data Auditing in Facial Recognition Systems},
+  booktitle = {{USENIX} Security 2023}
+  year      = {2023}
+}
 ```
